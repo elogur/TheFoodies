@@ -23,6 +23,31 @@ To run the main notebook `main.ipynb`, you need to:
 
 ## Usage
 
-1. Clone the repository:
+1. Clone the repository, download the dataset, and set up your environment:
    ```bash
+   # Clone the project
    git clone https://github.com/your-username/TheFoodies.git
+   cd TheFoodies
+
+   # Download the dataset manually from Kaggle:
+   # https://www.kaggle.com/datasets/shuyangli94/food-com-recipes-and-user-interactions
+   # Then extract the contents into a folder named 'archive/' at the root of the project.
+
+   # The folder structure should look like:
+   # TheFoodies/
+   # ├── archive/
+   # │   ├── RAW_recipes.csv
+   # │   └── interactions.csv
+   # ├── main.ipynb
+   # └── README.md
+
+   # (Optional) Set up a virtual environment
+   python -m venv env
+   source env/bin/activate   # On Windows: env\Scripts\activate
+
+   # Install dependencies
+   pip install -r requirements.txt
+
+   # Launch Jupyter Notebook
+   jupyter notebook
+
