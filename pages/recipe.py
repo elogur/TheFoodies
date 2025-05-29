@@ -10,15 +10,17 @@ recipe = st.session_state["recipe_detail"]
 #print(f"Recipe details: {recipe}")
 
 st.title(f"📄 {recipe['name']}")
-st.write(f"⭐ Rating : {recipe['rating']} / 5")
+st.write(f"⭐ Rating : {recipe['rating']:.2f} / 5")
 
-if "cooking_time" in recipe:
-    st.write(f"⏱️ Cooking time: {recipe['cooking_time']} minutes")
+st.write(f"⏱️ Cooking time: {recipe['minutes']} minutes")
 
 st.subheader("🧂 Ingredients")
 for ing in recipe["ingredients"]:
     st.markdown(f"- {ing}")
 
 st.subheader("📖 Instructions")
+for i, step in enumerate(recipe["instructions"], 1):
+    st.markdown(f"**Step {i}:** {step}")
 
-st.subheader("💬 Reviews")
+st.subheader("💬 Review")
+st.markdown(recipe["description"])

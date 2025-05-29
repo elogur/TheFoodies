@@ -17,6 +17,9 @@ class GraphManager():
         self.name_to_id: dict[str, int] = {}
         self.ingredient_to_recipes: dict[str, set] = None  # {ingredient: {recipe_id1, recipe_id2, ...}}
         self.recipe_ingredients: dict[int, list[str]] = {}
+        self.recipe_minutes: dict[int, int] = {}
+        self.recipe_instructions: dict[int, list[str]] = {}
+        self.recipe_descriptions: dict[int, str] = {}
         self.id_to_rating: dict[int, float] = {}
         self.id_to_rating_count: dict[int, int] = {}  # Not currently used but can be used in the future for a better weighting of ratings
         self.recipe_ids_in_graph: set[int] = set()  # Track which recipes are actually in the graph
@@ -35,7 +38,7 @@ class GraphManager():
         # This is a version choosing the first nrow rows, the file is in alphabetically order
         df = pd.read_csv(
             os.path.join(self.data_path, "RAW_recipes.csv"), 
-            usecols=['id', 'name', 'ingredients'], 
+            usecols=['id', 'name', 'ingredients', 'minutes', 'steps', 'description'],  # 'cooking_time' is optional, can be removed if not needed
             nrows=self.nrows
         )
         
@@ -56,6 +59,17 @@ class GraphManager():
         # Remove recipes with no valid ingredients after parsing
         df = df[df['ingredients_list'].apply(len) > 0]
         self.recipe_ids_in_graph = set(df['id'].tolist())
+
+        # Parse steps
+        df['steps_list'] = df['steps'].apply(self._parse_steps)
+        self.recipe_instructions = dict(zip(df['id'], df['steps_list']))
+
+        # Store minutes
+        self.recipe_minutes = dict(zip(df['id'], df['minutes'].fillna(0).astype(int)))
+
+        # Store descriptions
+        df['description'] = df['description'].fillna("No description available.")
+        self.recipe_descriptions = dict(zip(df['id'], df['description']))
 
         # Create name dictionaries
         self.id_to_name = dict(zip(df["id"], df["name"]))
@@ -83,6 +97,13 @@ class GraphManager():
                 clean_ingredient = ingredient.lower().strip()
                 cleaned_ingredients.append(clean_ingredient)
         return cleaned_ingredients
+    
+    def _parse_steps(self, steps_str):
+        try:
+            steps = ast.literal_eval(steps_str)
+            return [step.strip() for step in steps if isinstance(step, str)]
+        except Exception:
+            return []
 
     def load_ratings(self):
         """Load and calculate average ratings for each recipe"""
@@ -212,6 +233,18 @@ class GraphManager():
         ingredients_2 = set(self.get_recipe_ingredients(recipe_id2))
         return sorted(list(ingredients_1.intersection(ingredients_2)))
     
+    def get_instructions(self, recipe_id: int):
+        """Returns a list of instructions (steps) for a recipe."""
+        return self.recipe_instructions.get(recipe_id, ["No instructions available."])
+
+    def get_minutes(self, recipe_id: int):
+        """Returns the estimated time in minutes for a recipe."""
+        return self.recipe_minutes.get(recipe_id, 0)
+
+    def get_description(self, recipe_id: int):
+        """Returns the description of a recipe."""
+        return self.recipe_descriptions.get(recipe_id, "No description available.")
+
     def recommend_similar_recipes(self, recipe_id: int, top_k: int =10, normalization_type: int=0):
         """
         Get top-k most similar recipes to the given recipe.
@@ -221,7 +254,10 @@ class GraphManager():
             'similarity_score': similarity,
             'ingredients': ingredients,
             'shared_ingredients': shared_ingredients,
-            'rating': rating
+            'rating': rating,
+            'instructions': instructions,
+            'minutes': minutes,
+            'description': description
         """
 
         if not recipe_id in self.graph:
@@ -235,6 +271,9 @@ class GraphManager():
             rating = self.get_avg_recipe_rating(neighbor)
             ingredients = self.get_recipe_ingredients(neighbor)
             shared_ingredients = self.get_shared_ingredients(recipe_id, neighbor)
+            instructions = self.get_instructions(neighbor)
+            minutes = self.get_minutes(neighbor)
+            description = self.get_description(neighbor)
 
             neighbors.append({
                 'id': neighbor,
@@ -242,7 +281,10 @@ class GraphManager():
                 'similarity_score': similarity,
                 'ingredients': ingredients,
                 'shared_ingredients': shared_ingredients,
-                'rating': rating
+                'rating': rating,
+                'instructions': instructions,
+                'minutes': minutes,
+                'description': description
             })
 
         # Sort by similarity score and return top-k
