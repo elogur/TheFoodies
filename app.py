@@ -1,5 +1,6 @@
 import streamlit as st
-from recommender import recommander, get_all_recipes
+from recommender.graph_manager import recipe_recommender, graph_manager
+
 
 st.set_page_config(page_title="Recipe Recommender", layout="wide")
 
@@ -60,33 +61,35 @@ with col1:
 
 with col2:
     st.markdown("### Statistics")
-    base_recipe = st.session_state["search_input"] if st.session_state["search_input"] else "Pizza"
-    recettes = get_all_recipes()
-    total = len(recettes)
-    avg_common = 4 
-    st.write(f"**Base recipe:** {base_recipe}")
-    st.write(f"**Recipes analyzed:** {total}")
-    st.write(f"**Avg ingredients in common:** {avg_common}")
+
 
 st.markdown("---")
 
 # --------- RECOMMANDATIONS ----------
 if st.session_state["search_input"]:
     st.markdown("### 🔝 Top 10 Recommendations")
-    results = recommander(st.session_state["search_input"])
+
+    recipe_id, suggestions = graph_manager.find_recipe_by_name(st.session_state["search_input"])
+    if recipe_id is not None:
+        results = recipe_recommender.graph_manager.recommend_similar_recipes(recipe_id, top_k=10)
+    else:
+        st.warning(f"Aucune recette trouvée. Suggestions : {', '.join(suggestions)}")
+        results = []
     
     for r in results:
         with st.container():
             col1, col2 = st.columns([4, 1])
             with col1:
                 st.markdown(f"**{r['name']}**")
-                st.markdown(f"{r['common_ingredients']} ingredients in common")
+                st.markdown(f"{len(r['shared_ingredients'])} common ingredients")
+                
                 if st.button("Details", key=f"btn_{r['name']}"):
-                    st.session_state["recipe_detail"] = r["name"]
+                    st.session_state["recipe_detail"] = r
                     st.switch_page("pages/recipe.py")
 
             with col2:
-                st.markdown(f"⭐ **{r['rating']}**")
+                st.markdown(f"⭐ **{r['rating']:.1f}**" if r["rating"] else "⭐ **N/A**")
             st.markdown("---")
+
 else:
     st.info("Enter a recipe to get recommendations.")
