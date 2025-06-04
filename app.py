@@ -53,15 +53,33 @@ with col1:
         key="input_recipe",  
         label_visibility="collapsed"
     )
-    
+
+    norm_method = st.selectbox(
+        "🔢 Similarity Calculation Method:",
+        options=[
+            "0 - Number of shared ingredients",
+            "1 - Normalized by ingredient count",
+            "2 - Normalized + Recipe rating"
+        ],
+        index=1
+    )
+
+    norm_type = int(norm_method.split(" - ")[0])
+
+    explanation_map = {
+        0: "👉 **Method 0**: The more ingredients two recipes share, the more similar they are considered.",
+        1: "👉 **Method 1**: The number of shared ingredients is divided by the total number of ingredients in the compared recipe. This avoids favoring long recipes.",
+        2: "👉 **Method 2**: Like Method 1, but also incorporates the average recipe rating (weighted). Ideal for finding alternatives that are both similar **and** well-rated."
+    }
+    st.markdown(explanation_map[norm_type])
+
     search_clicked = st.button("🔍 Search", use_container_width=False)
     
     if search_clicked or input_recipe != st.session_state["search_input"]:
         st.session_state["search_input"] = input_recipe
 
-with col2:
-    st.markdown("### Statistics")
-
+#with col2:
+    #st.markdown("### Statistics")
 
 st.markdown("---")
 
@@ -71,7 +89,7 @@ if st.session_state["search_input"]:
 
     recipe_id, suggestions = graph_manager.find_recipe_by_name(st.session_state["search_input"])
     if recipe_id is not None:
-        results = recipe_recommender.graph_manager.recommend_similar_recipes(recipe_id, top_k=10)
+        results = recipe_recommender.graph_manager.recommend_similar_recipes(recipe_id, top_k=10, normalization_type=norm_type)
     else:
         st.warning(f"Aucune recette trouvée. Suggestions : {', '.join(suggestions)}")
         results = []
