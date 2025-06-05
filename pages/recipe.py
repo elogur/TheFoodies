@@ -3,7 +3,7 @@ import streamlit as st
 st.set_page_config(page_title="Recipe page")
 
 if "recipe_detail" not in st.session_state:
-    st.error("Aucune recette sélectionnée.")
+    st.error("Recipe details not found. Please select a recipe from the home page.")
     st.stop()
 
 recipe = st.session_state["recipe_detail"]

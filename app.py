@@ -91,7 +91,7 @@ if st.session_state["search_input"]:
     if recipe_id is not None:
         results = recipe_recommender.graph_manager.recommend_similar_recipes(recipe_id, top_k=10, normalization_type=norm_type)
     else:
-        st.warning(f"Aucune recette trouvée. Suggestions : {', '.join(suggestions)}")
+        st.warning(f"Recipe not found. Try : {', '.join(suggestions)}")
         results = []
     
     for r in results:
