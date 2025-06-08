@@ -57,9 +57,9 @@ with col1:
     norm_method = st.selectbox(
         "🔢 Similarity Calculation Method:",
         options=[
-            "0 - Number of shared ingredients",
-            "1 - Normalized by ingredient count",
-            "2 - Normalized + Recipe rating"
+            "0 - Most Shared Ingredients",
+            "1 - Highest Percentage of Shared Ingredients ",
+            "2 - Percentage of Shared Ingredients  + Recipe Rating"
         ],
         index=1
     )
@@ -68,7 +68,7 @@ with col1:
 
     explanation_map = {
         0: "👉 **Method 0**: The more ingredients two recipes share, the more similar they are considered.",
-        1: "👉 **Method 1**: The number of shared ingredients is divided by the total number of ingredients in the compared recipe. This avoids favoring long recipes.",
+        1: "👉 **Method 1**: The number of shared ingredients is divided by the total number of ingredients in the compared recipe. This avoids favoring recipes just because they have many ingredients.",
         2: "👉 **Method 2**: Like Method 1, but also incorporates the average recipe rating (weighted). Ideal for finding alternatives that are both similar **and** well-rated."
     }
     st.markdown(explanation_map[norm_type])
