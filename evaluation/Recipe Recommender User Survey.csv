@@ -1,0 +1,15 @@
+How interested are you in cooking and/or baking?;How often do you feel unsure about what to cook or bake? ;How likely would you use this recommender in your daily life? ;How satisfied are you overall with the recipe recommender?;Did the UI feel intuitive and easy to use?;How easy was it to find a recipe you were interested in?;How satisfied were you with the recommended recipes?;Would you consider cooking or baking one of the recommended recipes? ;Which recommending type gave you the best results?;What criteria are most important to you when choosing a recipe?;Would you like to see other types of recommendation strategies in the future? If yes which one?;Please leave any additional feedback you have.
+4;Often;4;5;Yes;4;4;Yes;1 – Normalized shared ingredients;"Ingredients;Similar to something I like";recommendation based on a list of ingredients;I like the simplicity of the interface
+4;Sometimes;4;5;Yes;5;5;Yes;2 – Normalized shared ingredients + normalized rating;"Ingredients;Dietary requirements;Similar to something I like";No;
+2;Sometimes;3;4;Yes;4;5;Yes;2 – Normalized shared ingredients + normalized rating;"Preparation time;Dietary requirements;Similar to something I like";only rating, just if one wants to find new recipies, maybe tastes one hasn't thought of previously;
+3;Often;3;3;Yes;3;3;Yes;1 – Normalized shared ingredients;"Preparation time;Ingredients";No;
+5;Sometimes;4;5;Yes;5;5;Yes;1 – Normalized shared ingredients;Ingredients;No;I trust the results because I can see the shared ingredients. It is very transparent not like algorithms of some big companies.
+2;Always;2;4;Yes;3;3;Maybe;2 – Normalized shared ingredients + normalized rating;"Dietary requirements;Similar to something I like";No;
+5;Rarely;5;5;Yes;5;5;Yes;2 – Normalized shared ingredients + normalized rating;"Ingredients;Popularity;Similar to something I like";No;
+5;Sometimes;4;5;Yes;5;4;Maybe;2 – Normalized shared ingredients + normalized rating;"Ingredients;Similar to something I like";No;
+5;Sometimes;5;4;Yes;5;4;Yes;1 – Normalized shared ingredients;"Preparation time;Ingredients;Similar to something I like";No;
+3;Often;4;5;Yes;5;4;Maybe;2 – Normalized shared ingredients + normalized rating;"Ingredients;Popularity";No;
+2;Sometimes;3;4;Yes;5;4;Maybe;2 – Normalized shared ingredients + normalized rating;"Preparation time;Ingredients;Similar to something I like";AI;Its a fun idea to get to know new foods
+4;Often;5;4;Yes;4;5;Yes;1 – Normalized shared ingredients;"Ingredients;Dietary requirements";No;
+5;Sometimes;4;5;Yes;5;4;Yes;2 – Normalized shared ingredients + normalized rating;"Preparation time;Ingredients;Similar to something I like";A vegan or vegetarian filter would be nice ?;
+4;Always;5;5;Yes;5;5;Yes;2 – Normalized shared ingredients + normalized rating;"Preparation time;Ingredients;Dietary requirements;Popularity;Similar to something I like";No;I actually just had though about how I made the same kind of pasta for the third time this week because I never know where to look for cooking ideas I actually like because I am kind of picky but that is actually helpful I would love to see the finished website
