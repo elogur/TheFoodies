@@ -18,13 +18,6 @@ The app allows users to search for recipes, view detailed descriptions, ingredie
 
 ---
 
-## 🗂️ Project Structure
-
-
-- `main.ipynb` – Main notebook for loading, processing, and visualizing recipe data using graphs.
-- `archive/` – Directory containing the `.csv` files extracted from the Kaggle dataset.
-- `requirements.txt` *(optional)* – List of required Python packages for running the notebook.
-
 ## Usage
 
 1. Clone the repository, download the dataset, and set up your environment:
@@ -42,13 +35,20 @@ The app allows users to search for recipes, view detailed descriptions, ingredie
    #├── archive/ # Dataset CSV files
    #│ ├── RAW_recipes.csv
    #│ └── RAW_interactions.csv
-   #├── app.py # Streamlit app main entry
+   #├── evaluation/
+   #│ ├── Recipe Recommender User Survey.csv
    #├── pages/
    #│ └── recipe.py # Recipe detail page
-   #├── graph/
+   #├── presentations/
+   #│ ├── graph_3d_colored_edges.html
+   #│ ├── main.ipynb # Jupyter notebook for exploration
+   #│ ├── The Foodies progress presentation.pdf
+   #│ ├── The Foodies proposal presentation.pdf
+   #│ └── The Foodies final presentation.pdf
+   #├── recommender/
+   #│ ├── statistics.ipynb
    #│ └── graph_manager.py # Graph-based logic and similarity engine
-   #├── main.ipynb # Jupyter notebook for exploration
-   #├── requirements.txt # Python dependencies
+   #├── app.py # Streamlit app main entry
    #└── README.md # Project documentation
 
    # (Optional) Set up a virtual environment
@@ -56,7 +56,6 @@ The app allows users to search for recipes, view detailed descriptions, ingredie
    source env/bin/activate   # On Windows: env\Scripts\activate
 
    # Install dependencies
-   pip install -r requirements.txt
 
    # Launch Jupyter Notebook
    jupyter notebook
