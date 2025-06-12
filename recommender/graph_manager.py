@@ -3,13 +3,13 @@ import ast
 import networkx as nx
 import os
 
-from collections import defaultdict
+from collections import defaultdict, Counter
 from itertools import combinations
 from difflib import get_close_matches
 
 class GraphManager():
 
-    def __init__(self, nrows=200, data_path='archive/', debug=False):
+    def __init__(self, nrows=200, data_path='archive/', debug=False, min_shared_ingredients=3, randomized_recipes=True):
         self.nrows: int = nrows  # nr of recipes used
         self.data_path: str = data_path
         self.graph: nx.Graph = None
@@ -25,30 +25,32 @@ class GraphManager():
         self.recipe_ids_in_graph: set[int] = set()  # Track which recipes are actually in the graph
         self.debug: bool = debug
 
-        df = self.load_data()
-        self.build_graph(df)
+        df = self.load_data(randomized_recipes=randomized_recipes)
+        self.build_graph(df, min_shared_ingredients=min_shared_ingredients)
         self.load_ratings()  # Load ratings after graph is built
 
-    def load_data(self):
+    def load_data(self, randomized_recipes=True):
         """Load and process recipe data using RAW_recipes.csv"""
         if self.debug:
             print("Loading recipe data...")
 
         # Load recipe data from RAW_recipes.csv with ingredients column
-        # This is a version choosing the first nrow rows, the file is in alphabetically order
-        df = pd.read_csv(
-            os.path.join(self.data_path, "RAW_recipes.csv"), 
-            usecols=['id', 'name', 'ingredients', 'minutes', 'steps', 'description'],  # 'cooking_time' is optional, can be removed if not needed
-            nrows=self.nrows
-        )
         
-        # TODO a version with random columns, should be used in production to prevent wrong alphabetically balance while limiting the recipes
-        # df = pd.read_csv(
-        #     os.path.join(self.data_path, "RAW_recipes.csv"), 
-        #     usecols=['id', 'name', 'ingredients']
-        # )
+        if randomized_recipes is False:
+            # This is a version choosing the first nrow rows, the file is in alphabetically order
+            df = pd.read_csv(
+                os.path.join(self.data_path, "RAW_recipes.csv"), 
+                usecols=['id', 'name', 'ingredients', 'minutes', 'steps', 'description'],
+                nrows=self.nrows
+            )
+        else:        
+            # a version with random columns, should be used in production to prevent wrong alphabetically balance while limiting the recipes
+            df = pd.read_csv(
+                os.path.join(self.data_path, "RAW_recipes.csv"), 
+                usecols=['id', 'name', 'ingredients', 'minutes', 'steps', 'description']
+            )  # read all not only nrows
 
-        # df = df.sample(n=self.nrows, random_state=42)
+            df = df.sample(n=self.nrows, random_state=42)  # random state so it is shuffled but always the same way
 
         # Remove entries without name
         df = df.dropna(subset=['name'])
@@ -59,6 +61,9 @@ class GraphManager():
         # Remove recipes with no valid ingredients after parsing
         df = df[df['ingredients_list'].apply(len) > 0]
         self.recipe_ids_in_graph = set(df['id'].tolist())
+
+        # Deprecated: Filter out top 0.5% most common ingredients
+        # df = self._filter_top_ingredients(df)
 
         # Parse steps
         df['steps_list'] = df['steps'].apply(self._parse_steps)
@@ -79,6 +84,31 @@ class GraphManager():
             print(f"Final recipes for graph: {len(df)}")
             print(f"Recipes with valid ingredients: {len(self.recipe_ids_in_graph)}")
 
+        return df
+
+    def _filter_top_ingredients(self, df):
+        """Remove top 1% most common ingredients to reduce non meaningful neighbor connections """
+        # Count ingredient frequencies
+        ingredient_counts = Counter()
+        for _, row in df.iterrows():
+            for ingredient in row['ingredients_list']:
+                ingredient_counts[ingredient] += 1
+        
+        # Get top 0.5% most common ingredients
+        total_ingredients = len(ingredient_counts)
+        top_1_percent = int(total_ingredients * 0.005)  # top 0.5% of ingredients
+        most_common = ingredient_counts.most_common(top_1_percent)
+        ingredients_to_remove = {ingredient for ingredient, _ in most_common}
+        
+        print(f"Removing {len(ingredients_to_remove)} common ingredients: {list(ingredients_to_remove)[:100]}")
+        
+        # Filter ingredients from recipes
+        df['ingredients_list'] = df['ingredients_list'].apply(
+            lambda ingredients: [ing for ing in ingredients if ing not in ingredients_to_remove]
+        )
+        
+        # Remove recipes with no ingredients left
+        df = df[df['ingredients_list'].apply(len) > 0]
         return df
 
     def _parse_ingredients(self, ingredients_str):
